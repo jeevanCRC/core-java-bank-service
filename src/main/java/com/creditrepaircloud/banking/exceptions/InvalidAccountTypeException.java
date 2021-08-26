@@ -1,3 +1,5 @@
+package com.creditrepaircloud.banking.exceptions;
+
 public class InvalidAccountTypeException extends Exception{
     String type;
 

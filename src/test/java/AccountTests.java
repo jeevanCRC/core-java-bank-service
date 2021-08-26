@@ -1,3 +1,11 @@
+import com.creditrepaircloud.banking.accounts.BankAccount;
+import com.creditrepaircloud.banking.accounts.CurrentAccount;
+import com.creditrepaircloud.banking.accounts.SavingsAccount;
+import com.creditrepaircloud.banking.accounts.Transaction;
+import com.creditrepaircloud.banking.exceptions.AccountNotFoundException;
+import com.creditrepaircloud.banking.exceptions.InsufficientFundsException;
+import com.creditrepaircloud.banking.exceptions.InvalidAccountTypeException;
+import com.creditrepaircloud.banking.exceptions.InvalidInputAmountException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,79 +17,40 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AccountTests {
-    BankService service = new BankService();
-    private Account account;
-    private Account account1;
+    private BankAccount savingsAccount1;
+    private BankAccount savingsAccount2;
+    private BankAccount currentAccount1;
+    private BankAccount currentAccount2;
 
     @BeforeEach
     public void setUp() {
-        account = new Account("Jeevan One", "Hyderabad One", "89237823902", "savings");
-        account1 = new Account("Jeevan Two", "Hyderabad Two", "89237823902", "savings");
+        savingsAccount1 = new SavingsAccount(121);
+        savingsAccount2 = new SavingsAccount(122);
+        currentAccount1 = new CurrentAccount(1122);
+        currentAccount2 = new CurrentAccount(1123);
     }
 
 
     @Test
-    void createAccountPositive() throws InvalidAccountTypeException {
-        service.createAccount(account);
-        assertEquals(0, account.getBalance());
+    void testGetAccountNumber()  {
+       assertEquals(121, savingsAccount1.getCustomerId());
+       assertEquals(1122, currentAccount1.getCustomerId());
     }
 
-    @Test
-    void createAccount_ThrowsInvalidAccountTypeException() {
-        assertThrows(InvalidAccountTypeException.class, () -> {
-            account.setType("sav");
-            service.createAccount(account);
-        });
-    }
 
     @Test
-    void checkDepositPositive() throws AccountNotFoundException {
-        service.deposit(account, 100);
-        assertEquals(100, account.getBalance());
-    }
-
-    @Test
-    void checkWithdrawPositive() throws AccountNotFoundException {
-        service.deposit(account, 2000);
-        service.withdraw(account, 500);
-        assertEquals(1500, account.getBalance());
-    }
-
-    @Test
-    void getTransactions_positive() throws AccountNotFoundException {
-        service.deposit(account, 2000);
-        service.withdraw(account, 500);
-        List<Transaction> transactionList = service.ListTransactions();
+    void getTransactions_positive() throws AccountNotFoundException, InvalidInputAmountException {
+        savingsAccount1.deposit(2000);
+        currentAccount1.deposit( 500);
+        List<Transaction> transactionList = BankAccount.ListTransactions();
         assertTrue(transactionList.size() > 0);
-    }
-
-    @Test
-    void getTransactions_checkEmptyTransactions() {
-        List<Transaction> transactionList = service.ListTransactions();
-        assertFalse(transactionList.size() > 0);
-    }
-
-    @Test
-    void transfer_CheckTransferAmount() throws AccountNotFoundException {
-        service.deposit(account, 2000);
-        service.transfer(account, account1, 500);
-        List<Transaction> transactionList = service.ListTransactions();
-        assertAll(() -> {
-            assertEquals(500, account1.getBalance());
-            assertEquals(1500, account.getBalance());
-            assertTrue(transactionList.size() > 0);
-        });
-    }
-
-
-    @ParameterizedTest
-    @ValueSource(ints = {123, 234, 345})
-    void getAccountNumber_Negative(int accountNumber) {
-        assertNull(service.getAccountByNumber(accountNumber));
     }
 
     @AfterEach
     public void tearDown() {
-        account = null;
+        savingsAccount1 = null;
+        savingsAccount2 = null;
+        currentAccount1 = null;
+        currentAccount2 = null;
     }
 }

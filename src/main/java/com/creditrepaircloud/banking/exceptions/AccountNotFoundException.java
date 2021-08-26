@@ -1,3 +1,5 @@
+package com.creditrepaircloud.banking.exceptions;
+
 public class AccountNotFoundException extends Exception{
     private int accountNumber;
 

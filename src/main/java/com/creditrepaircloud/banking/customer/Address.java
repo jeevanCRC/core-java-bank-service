@@ -1,0 +1,21 @@
+package com.creditrepaircloud.banking.customer;
+
+public class Address {
+    private String line1;
+    private String line2;
+    private String city;
+    private String state;
+    private String country;
+    private long zipcode;
+
+    public Address(String line1, String line2, String city, String state, String country, long zipcode) {
+        this.line1 = line1;
+        this.line2 = line2;
+        this.city = city;
+        this.state = state;
+        this.country = country;
+        this.zipcode = zipcode;
+    }
+
+
+}

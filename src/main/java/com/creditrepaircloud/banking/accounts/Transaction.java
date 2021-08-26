@@ -1,17 +1,19 @@
+package com.creditrepaircloud.banking.accounts;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Transaction {
     private int id;
-    private String type;
+    private TransactionType type;
     private Date date;
     private int fromAccount;
     private int toAccount;
-    private int amount;
+    private double amount;
 
     private static int transIdSequence = 1000;
 
-    public Transaction(String type, int fromAccount, int toAccount, int amount) {
+    public Transaction(TransactionType type, int fromAccount, int toAccount, double amount) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
 
@@ -27,47 +29,25 @@ public class Transaction {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getType() {
+    public TransactionType getType() {
         return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public Date getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
     public int getFromAccount() {
         return fromAccount;
     }
 
-    public void setFromAccount(int fromAccount) {
-        this.fromAccount = fromAccount;
-    }
 
     public int getToAccount() {
         return toAccount;
     }
 
-    public void setToAccount(int toAccount) {
-        this.toAccount = toAccount;
+    public double getAmount() {
+        return this.amount;
     }
 
-    public int getAmount() {
-        return amount;
-    }
-
-    public void setAmount(int amount) {
-        this.amount = amount;
-    }
 }

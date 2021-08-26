@@ -1,21 +1,30 @@
+import com.creditrepaircloud.banking.accounts.BankAccount;
+import com.creditrepaircloud.banking.accounts.CurrentAccount;
+import com.creditrepaircloud.banking.accounts.SavingsAccount;
+import com.creditrepaircloud.banking.accounts.Transaction;
+import com.creditrepaircloud.banking.customer.AccountHolder;
+import com.creditrepaircloud.banking.exceptions.*;
+import com.creditrepaircloud.banking.services.AccountTransfer;
+import com.creditrepaircloud.banking.services.CoreBankingServices;
+
 import java.util.List;
 import java.util.Scanner;
 
 public class Menu {
     public void show() throws
             InvalidAccountTypeException,
-            AccountNotFoundException
-    {
+            AccountNotFoundException, InvalidInputAmountException, InsufficientFundsException, InvalidInputException {
         int option;
-        BankService service = new BankService();
-        List<Account> listAct;
-        Account account;
+        CoreBankingServices service = new AccountTransfer();
+        BankAccount account;
         int accountNumber;
         int amount;
         int confirm;
+        AccountHolder customer;
 
         Scanner scanner = new Scanner(System.in);
         Scanner input = new Scanner(System.in);
+        Scanner input2 = new Scanner(System.in);
 
         System.out.println("Welcome to Java Bank \n");
         System.out.println("Choose your option \n");
@@ -23,8 +32,8 @@ public class Menu {
         System.out.println("2 - Deposit Money");
         System.out.println("3 - Withdraw Money");
         System.out.println("4 - Transfer Money");
-        System.out.println("5 - List Accounts");
-        System.out.println("6 - List Transactions");
+        System.out.println("5 - List Transactions");
+        System.out.println("6 - Check Balance");
         System.out.println("7 - Exit");
 
         do {
@@ -36,18 +45,29 @@ public class Menu {
                 case 1:
                     System.out.println("Create Account");
                     System.out.println("Enter your Name");
-                    String name = input.nextLine();
-                    System.out.println("Enter your Address");
-                    String address = input.nextLine();
+                    String name = input2.nextLine();
                     System.out.println("Enter your Mobile Number");
-                    String mobile = input.nextLine();
+                    String mobile = input2.nextLine();
                     System.out.println("Enter Account type (savings/current)?");
-                    String accountType = input.nextLine();
+                    String accountType = input2.nextLine();
 
-                    account = new Account(name, address, mobile, accountType);
-                    service.createAccount(account);
+                    customer = new AccountHolder(name, mobile);
 
-                    System.out.println("Account Created Successfully! \n Account Number: "+ account.getAccountNumber());
+                    switch (accountType) {
+                        case "savings":
+                            account = new SavingsAccount(customer.getId());
+                            customer.createAccount(account);
+                            System.out.println("Savings Account Created Successfully! \n Account Number: "+ account.getAccountNumber());
+                            break;
+                        case "current":
+                            account = new CurrentAccount(customer.getId());
+                            customer.createAccount(account);
+                            System.out.println("Current Account Created Successfully! \n Account Number: "+ account.getAccountNumber());
+                            break;
+                        default:
+                            System.out.println("Invalid Account type specified");
+                            break;
+                    }
 
                     break;
                 case 2:
@@ -55,11 +75,15 @@ public class Menu {
                     accountNumber = input.nextInt();
                     System.out.println("Enter Amount to deposit");
                     amount = input.nextInt();
+                    System.out.println(accountNumber);
 
-                    account = service.getAccountByNumber(accountNumber);
+                    account = AccountHolder.getAccountByNumber(accountNumber);
+                    if (account != null) {
+                        account.deposit(amount);
+                        System.out.println("** Amount Credited Successfully! **");
+                    }
 
-                    service.deposit(account, amount);
-                    System.out.println("** Amount Credited Successfully! **");
+
                     break;
                 case 3:
                     System.out.println("Enter Customer Account Number");
@@ -67,10 +91,13 @@ public class Menu {
                     System.out.println("Enter Amount to withdraw");
                     amount = input.nextInt();
 
-                    account = service.getAccountByNumber(accountNumber);
+                    account = AccountHolder.getAccountByNumber(accountNumber);
+                    if (account != null) {
+                        account.withdraw(amount);
+                        System.out.println("** Amount Debited Successfully! **");
+                    }
 
-                    service.withdraw(account, amount);
-                    System.out.println("** Amount Debited Successfully! **");
+
                     break;
                 case 4:
                     System.out.println("Transfer Money \n -----------------------------------");
@@ -87,19 +114,17 @@ public class Menu {
                         System.out.println("Confirm transfer? \n 1 - Yes \n 2 - No");
                         confirm = input.nextInt();
                         if(confirm == 1) {
-                            Account fromAccount = service.getAccountByNumber(accountNumber);
-                            Account toAccount = service.getAccountByNumber(accountNumberTo);
-
-                            service.transfer(fromAccount, toAccount, amount);
+                            BankAccount fromAccount = AccountHolder.getAccountByNumber(accountNumber);
+                            BankAccount toAccount = AccountHolder.getAccountByNumber(accountNumberTo);
+                            service.transferAmount(fromAccount, toAccount, amount);
                             System.out.println("** Amount Transfer Successful! **");
                         } else {
                             System.out.println("Transaction is cancelled!");
                         }
                     } else {
-                        Account fromAccount = service.getAccountByNumber(accountNumber);
-                        Account toAccount = service.getAccountByNumber(accountNumberTo);
-
-                        service.transfer(fromAccount, toAccount, amount);
+                        BankAccount fromAccount = AccountHolder.getAccountByNumber(accountNumber);
+                        BankAccount toAccount = AccountHolder.getAccountByNumber(accountNumberTo);
+                        service.transferAmount(fromAccount, toAccount, amount);
                         System.out.println("** Amount Transfer Successful! **");
                     }
 
@@ -107,21 +132,23 @@ public class Menu {
 
                     break;
                 case 5:
-                    System.out.println("Accounts List");
-                    System.out.println("----------------------------------------------");
-                    listAct = service.listAccounts();
-
-                    for (Account act : listAct) {
-                        System.out.println(act.getAccountNumber()+" "+act.getName()+" "+act.getAddress()+" "+act.getMobile()+" "+act.getType()+" "+act.getBalance());
-                    }
-                    break;
-                case 6:
                     System.out.println("Transactions List");
                     System.out.println("----------------------------------------------");
-                    List<Transaction> transactionList = service.ListTransactions();
+                    List<Transaction> transactionList = BankAccount.ListTransactions();
 
                     for (Transaction trans : transactionList) {
                         System.out.println(trans.getId()+" "+trans.getAmount()+" "+trans.getType()+" "+trans.getDate()+" "+trans.getFromAccount()+" "+trans.getToAccount());
+                    }
+                    break;
+                case 6:
+                    System.out.println("Check Balance");
+                    System.out.println("Enter Customer Account Number");
+                    accountNumber = input.nextInt();
+
+                    account = AccountHolder.getAccountByNumber(accountNumber);
+
+                    if(account != null) {
+                        System.out.println("Available Balance: "+ account.getBalance());
                     }
                     break;
                 case 7:
