@@ -1,3 +1,5 @@
+package accounts;
+
 import com.creditrepaircloud.banking.accounts.BankAccount;
 import com.creditrepaircloud.banking.accounts.CurrentAccount;
 import com.creditrepaircloud.banking.accounts.SavingsAccount;
@@ -86,12 +88,5 @@ public class CurrentAccountTests {
         assertThrows(InsufficientFundsException.class, () -> {
             currentAccount1.withdraw( 2000);
         });
-    }
-
-
-    @AfterEach
-    public void tearDown() {
-        currentAccount1 = null;
-        currentAccount2 = null;
     }
 }

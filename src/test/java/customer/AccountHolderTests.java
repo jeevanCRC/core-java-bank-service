@@ -1,16 +1,21 @@
+package customer;
+
 import com.creditrepaircloud.banking.accounts.BankAccount;
 import com.creditrepaircloud.banking.accounts.SavingsAccount;
 import com.creditrepaircloud.banking.customer.AccountHolder;
 import com.creditrepaircloud.banking.customer.Address;
+import com.creditrepaircloud.banking.exceptions.AccountNotFoundException;
+import com.creditrepaircloud.banking.exceptions.InvalidAddressException;
 import com.creditrepaircloud.banking.exceptions.InvalidInputAmountException;
 import com.creditrepaircloud.banking.exceptions.InvalidInputException;
 import org.junit.jupiter.api.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AccountHolderTests {
 
     private AccountHolder customer;
@@ -22,23 +27,12 @@ public class AccountHolderTests {
 
     @Test
     void testCustomerInvalidInputException() {
-        assertThrows(InvalidInputException.class, () -> {
-            new AccountHolder("", "");
+        assertAll(() -> {
+            assertThrows(InvalidInputException.class, () -> { new AccountHolder("", ""); });
+            assertThrows(InvalidInputException.class, () -> { new AccountHolder("", "9499372892"); });
+            assertThrows(InvalidInputException.class, () -> { new AccountHolder("Test One", ""); });
         });
-    }
 
-    @Test
-    void testCustomerWithNameEmpty() {
-        assertThrows(InvalidInputException.class, () -> {
-            new AccountHolder("", "9499372892");
-        });
-    }
-
-    @Test
-    void testCustomerWithMobileEmptyEmpty() {
-        assertThrows(InvalidInputException.class, () -> {
-            new AccountHolder("Test One", "");
-        });
     }
 
     @Test
@@ -52,15 +46,7 @@ public class AccountHolderTests {
     }
 
     @Test
-    void testCustomerAddress() {
-        Address address = new Address("123-2", "test", "Test City", "State", "India", 823892398);
-        customer.setAddress(address);
-
-        assertEquals(address, customer.getAddress());
-    }
-
-    @Test
-    void testCreateCustomer() throws InvalidInputException {
+    void testCreateAccount() throws InvalidInputException {
         AccountHolder customer3 = new AccountHolder("Test Three", "8738838239");
         BankAccount account =new SavingsAccount(customer3.getId());
         customer3.createAccount(account);
@@ -69,41 +55,36 @@ public class AccountHolderTests {
     }
 
     @Test
-    void testGetAccountNumberPositive() throws InvalidInputException {
+    void testGetAccountNumberPositive() throws InvalidInputException, AccountNotFoundException {
         AccountHolder customer3 = new AccountHolder("Test Three", "8738838239");
         BankAccount account =new SavingsAccount(customer3.getId());
         customer3.createAccount(account);
-        BankAccount account1 =AccountHolder.getAccountByNumber(account.getAccountNumber());
+        BankAccount account1 =customer3.getAccountByNumber(account.getAccountNumber());
 
         assertEquals(account, account1);
     }
 
     @Test
-    void testGetAccountNumberReturnsNull() {
-        BankAccount account1 =AccountHolder.getAccountByNumber(123);
-        assertNull(account1);
+    void testGetAccountNumberThrowsException() throws AccountNotFoundException {
+        assertThrows(AccountNotFoundException.class, () -> {
+            BankAccount account1 =customer.getAccountByNumber(123);
+        });
     }
 
-    @Order(1)
     @Test
     void testListAccountsWithNoAccounts() {
-        List<BankAccount> accounts =AccountHolder.getAccounts();
+        List<BankAccount> accounts =customer.listAccounts();
         System.out.println(accounts.size());
         assertFalse(accounts.size() > 0);
     }
 
-    @Order(2)
     @Test
     void testListAccountsWithAddedAccounts() throws InvalidInputException {
         AccountHolder customer3 = new AccountHolder("Test Three", "8738838239");
         BankAccount account =new SavingsAccount(customer3.getId());
         customer3.createAccount(account);
-        List<BankAccount> accounts =AccountHolder.getAccounts();
+        List<BankAccount> accounts =customer3.listAccounts();
         assertTrue(accounts.size() > 0);
     }
 
-    @AfterEach
-    public void tearDown() {
-        customer = null;
-    }
 }

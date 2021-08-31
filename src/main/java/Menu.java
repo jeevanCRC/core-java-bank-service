@@ -16,11 +16,11 @@ public class Menu {
             AccountNotFoundException, InvalidInputAmountException, InsufficientFundsException, InvalidInputException {
         int option;
         CoreBankingServices service = new AccountTransfer();
-        BankAccount account;
+        BankAccount account = null;
         int accountNumber;
         int amount;
         int confirm;
-        AccountHolder customer;
+        AccountHolder customer = null;
 
         Scanner scanner = new Scanner(System.in);
         Scanner input = new Scanner(System.in);
@@ -77,7 +77,7 @@ public class Menu {
                     amount = input.nextInt();
                     System.out.println(accountNumber);
 
-                    account = AccountHolder.getAccountByNumber(accountNumber);
+                    account = customer.getAccountByNumber(accountNumber);
                     if (account != null) {
                         account.deposit(amount);
                         System.out.println("** Amount Credited Successfully! **");
@@ -91,7 +91,8 @@ public class Menu {
                     System.out.println("Enter Amount to withdraw");
                     amount = input.nextInt();
 
-                    account = AccountHolder.getAccountByNumber(accountNumber);
+                    assert customer != null;
+                    account = customer.getAccountByNumber(accountNumber);
                     if (account != null) {
                         account.withdraw(amount);
                         System.out.println("** Amount Debited Successfully! **");
@@ -114,16 +115,16 @@ public class Menu {
                         System.out.println("Confirm transfer? \n 1 - Yes \n 2 - No");
                         confirm = input.nextInt();
                         if(confirm == 1) {
-                            BankAccount fromAccount = AccountHolder.getAccountByNumber(accountNumber);
-                            BankAccount toAccount = AccountHolder.getAccountByNumber(accountNumberTo);
+                            BankAccount fromAccount = customer.getAccountByNumber(accountNumber);
+                            BankAccount toAccount = customer.getAccountByNumber(accountNumberTo);
                             service.transferAmount(fromAccount, toAccount, amount);
                             System.out.println("** Amount Transfer Successful! **");
                         } else {
                             System.out.println("Transaction is cancelled!");
                         }
                     } else {
-                        BankAccount fromAccount = AccountHolder.getAccountByNumber(accountNumber);
-                        BankAccount toAccount = AccountHolder.getAccountByNumber(accountNumberTo);
+                        BankAccount fromAccount = customer.getAccountByNumber(accountNumber);
+                        BankAccount toAccount = customer.getAccountByNumber(accountNumberTo);
                         service.transferAmount(fromAccount, toAccount, amount);
                         System.out.println("** Amount Transfer Successful! **");
                     }
@@ -134,10 +135,10 @@ public class Menu {
                 case 5:
                     System.out.println("Transactions List");
                     System.out.println("----------------------------------------------");
-                    List<Transaction> transactionList = BankAccount.ListTransactions();
+                    List<Transaction> transactionList = account.listTransactions();
 
                     for (Transaction trans : transactionList) {
-                        System.out.println(trans.getId()+" "+trans.getAmount()+" "+trans.getType()+" "+trans.getDate()+" "+trans.getFromAccount()+" "+trans.getToAccount());
+                        System.out.println(trans.getTransaction());
                     }
                     break;
                 case 6:
@@ -145,7 +146,7 @@ public class Menu {
                     System.out.println("Enter Customer Account Number");
                     accountNumber = input.nextInt();
 
-                    account = AccountHolder.getAccountByNumber(accountNumber);
+                    account = customer.getAccountByNumber(accountNumber);
 
                     if(account != null) {
                         System.out.println("Available Balance: "+ account.getBalance());

@@ -1,3 +1,5 @@
+package services;
+
 import com.creditrepaircloud.banking.accounts.BankAccount;
 import com.creditrepaircloud.banking.accounts.SavingsAccount;
 import com.creditrepaircloud.banking.customer.AccountHolder;
@@ -56,17 +58,24 @@ public class AccountTransferTests {
     @Test
     void testTransferAmountWithInsufficientFundsException() throws InsufficientFundsException, InvalidInputAmountException {
         account2.deposit(2000);
-        assertThrows(InsufficientFundsException.class, () -> {
-            transferService.transferAmount(account2, account1, 2500);
+        assertAll(() -> {
+            assertEquals(2000, account2.getBalance());
+            assertThrows(InsufficientFundsException.class, () -> {
+                transferService.transferAmount(account2, account1, 2500);
+            });
         });
     }
 
     @Test
     void testTransferAmountWithZeroAmount() throws InsufficientFundsException, InvalidInputAmountException {
         account2.deposit(2000);
-        assertThrows(InvalidInputAmountException.class, () -> {
-            transferService.transferAmount(account2, account1, 0);
+        assertAll(() -> {
+            assertEquals(2000, account2.getBalance());
+            assertThrows(InvalidInputAmountException.class, () -> {
+                transferService.transferAmount(account2, account1, 0);
+            });
         });
+
     }
 
 }

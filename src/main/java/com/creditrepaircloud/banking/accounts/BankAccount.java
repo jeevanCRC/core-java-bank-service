@@ -12,7 +12,7 @@ public abstract class BankAccount implements Account {
     private double balance;
     protected AccountType accountType;
     private final int customerId;
-    static List<Transaction> transactionList = new LinkedList<>();
+    private List<Transaction> transactionList = new LinkedList<>();
 
     private static int accountNumberSequence = 1234;
 
@@ -36,17 +36,17 @@ public abstract class BankAccount implements Account {
         return this.balance;
     }
 
-    protected void credit(double amount) throws InvalidInputAmountException {
+    protected void credit(double amount, int refNumber) throws InvalidInputAmountException {
         if (amount <= 0) {
             throw new InvalidInputAmountException(amount);
         }
         this.balance = this.balance + amount;
-        Transaction transaction = new Transaction(TransactionType.CREDIT, this.accountNumber, 0, amount);
+        Transaction transaction = new Transaction(TransactionType.CREDIT, refNumber, amount);
         transactionList.add(transaction);
 
     }
 
-    protected void debit(double amount) throws InvalidInputAmountException, InsufficientFundsException {
+    protected void debit(double amount, int refNumber) throws InvalidInputAmountException, InsufficientFundsException {
         if (amount <= 0) {
             throw new InvalidInputAmountException(amount);
         }
@@ -56,29 +56,11 @@ public abstract class BankAccount implements Account {
         }
 
         this.balance = this.balance - amount;
-        Transaction transaction = new Transaction(TransactionType.DEBIT, this.accountNumber, 0, amount);
+        Transaction transaction = new Transaction(TransactionType.DEBIT, refNumber, amount);
         transactionList.add(transaction);
-
     }
 
-    protected void transferAmount(BankAccount destination, double amount) throws InvalidInputAmountException, InsufficientFundsException {
-        if (amount <= 0) {
-            throw new InvalidInputAmountException(amount);
-        }
-
-        if(this.balance < amount) {
-            throw new InsufficientFundsException(amount);
-        }
-
-        this.balance = this.balance - amount;
-        destination.balance = destination.balance + amount;
-        Transaction debitTransaction = new Transaction(TransactionType.DEBIT, this.getAccountNumber(), destination.getAccountNumber(), amount);
-        Transaction creditTransaction = new Transaction(TransactionType.CREDIT, destination.getAccountNumber(), this.getAccountNumber(), amount);
-        transactionList.add(debitTransaction);
-        transactionList.add(creditTransaction);
-    }
-
-    public static List<Transaction> ListTransactions() {
-        return  transactionList;
+    public List<Transaction> listTransactions() {
+        return  this.transactionList;
     }
 }

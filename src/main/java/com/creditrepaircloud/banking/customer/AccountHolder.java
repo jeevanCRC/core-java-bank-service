@@ -2,6 +2,7 @@ package com.creditrepaircloud.banking.customer;
 
 import com.creditrepaircloud.banking.accounts.BankAccount;
 import com.creditrepaircloud.banking.exceptions.InvalidInputException;
+import com.creditrepaircloud.banking.exceptions.AccountNotFoundException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -11,7 +12,7 @@ public class AccountHolder {
     private final String mobile;
     private Address address;
     private final int id;
-    static List<BankAccount> accounts = new LinkedList<>();
+    private final List<BankAccount> accounts = new LinkedList<>();
 
     private static int customerIdSequence = 1000;
 
@@ -46,16 +47,19 @@ public class AccountHolder {
         accounts.add(account);
     }
 
-    public static List<BankAccount> getAccounts() {
-        return accounts;
+    // Proper naming for the
+    public List<BankAccount> listAccounts() {
+        return this.accounts;
     }
 
-    public static BankAccount getAccountByNumber(int accountNumber) {
+    //Find account by number
+    // function should be pretty short
+    public  BankAccount getAccountByNumber(int accountNumber) throws AccountNotFoundException {
         for (BankAccount account : accounts) {
             if (account.getAccountNumber() == accountNumber) {
                 return account;
             }
         }
-        return null;
+        throw new AccountNotFoundException(accountNumber);
     }
 }

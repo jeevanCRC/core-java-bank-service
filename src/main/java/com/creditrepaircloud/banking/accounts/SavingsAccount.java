@@ -12,17 +12,18 @@ public class SavingsAccount extends BankAccount{
 
     @Override
     public void deposit(double amount) throws InvalidInputAmountException {
-            this.credit(amount);
+            this.credit(amount, 0);
     }
 
     @Override
     public void withdraw(double amount) throws InvalidInputAmountException, InsufficientFundsException {
-        this.debit(amount);
+        this.debit(amount, 0);
     }
 
     @Override
     public void transfer(BankAccount destination, double amount) throws InvalidInputAmountException, InsufficientFundsException {
-        this.transferAmount(destination, amount);
+        this.debit(amount, destination.getAccountNumber());
+        destination.credit(amount, this.getAccountNumber());
     }
 
 }

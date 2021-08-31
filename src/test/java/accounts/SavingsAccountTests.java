@@ -1,3 +1,5 @@
+package accounts;
+
 import com.creditrepaircloud.banking.accounts.BankAccount;
 import com.creditrepaircloud.banking.accounts.CurrentAccount;
 import com.creditrepaircloud.banking.accounts.SavingsAccount;
@@ -66,11 +68,5 @@ public class SavingsAccountTests {
             assertEquals(600, savingsAccount1.getBalance());
             assertEquals(700, savingsAccount2.getBalance());
         });
-    }
-
-    @AfterEach
-    public void tearDown() {
-        savingsAccount1 = null;
-        savingsAccount2 = null;
     }
 }

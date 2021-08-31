@@ -1,3 +1,5 @@
+package accounts;
+
 import com.creditrepaircloud.banking.accounts.BankAccount;
 import com.creditrepaircloud.banking.accounts.CurrentAccount;
 import com.creditrepaircloud.banking.accounts.SavingsAccount;
@@ -18,16 +20,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class AccountTests {
     private BankAccount savingsAccount1;
-    private BankAccount savingsAccount2;
     private BankAccount currentAccount1;
-    private BankAccount currentAccount2;
 
     @BeforeEach
     public void setUp() {
         savingsAccount1 = new SavingsAccount(121);
-        savingsAccount2 = new SavingsAccount(122);
         currentAccount1 = new CurrentAccount(1122);
-        currentAccount2 = new CurrentAccount(1123);
     }
 
 
@@ -42,15 +40,8 @@ public class AccountTests {
     void getTransactions_positive() throws AccountNotFoundException, InvalidInputAmountException {
         savingsAccount1.deposit(2000);
         currentAccount1.deposit( 500);
-        List<Transaction> transactionList = BankAccount.ListTransactions();
+        List<Transaction> transactionList = savingsAccount1.listTransactions();
         assertTrue(transactionList.size() > 0);
     }
 
-    @AfterEach
-    public void tearDown() {
-        savingsAccount1 = null;
-        savingsAccount2 = null;
-        currentAccount1 = null;
-        currentAccount2 = null;
-    }
 }
